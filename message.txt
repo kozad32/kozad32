@@ -1,0 +1,166 @@
+ 
+const Discord =require ('discord.js')
+const client = new Discord.Client({
+    disableEveryone: true,
+    partials : ["MESSAGE", "CHANNEL", "REACTION"]
+});
+const fs = require("fs");
+const ms = require ('ms')
+const prefix = '.'
+require('events').defaultMaxListeners = 70;
+console.log('Done')
+
+client.on("ready", () => {
+ 
+  console.log(`Logged in as ${client.user.username}!`);
+ 
+  client.user.setActivity(`.help`)
+});
+
+
+client.on('message',async message => {
+  if(message.content.startsWith(prefix + "inrole")) { 
+  let args = message.content.split(" ").slice(1)
+    if (!message.guild.member(client.user).hasPermission('SEND_MESSAGES')) return;
+   if (!message.guild.member(client.user).hasPermission('MANAGE_GUILD')) return message.channel.send(" !")
+     let role;
+  if(args[0] && isNaN(args[0]) && message.mentions.roles.first()) role = message.mentions.roles.first()
+  if(args[0] && isNaN(args[0]) && !message.mentions.roles.first()){
+    role = message.guild.roles.cache.find(e => e.name.toLowerCase().trim() == args.slice(0).join(" ").toLowerCase().trim())
+
+    if(!message.guild.roles.cache.find(e => e.name.toLowerCase().trim() == args.slice(0).join(" ").toLowerCase().trim())) return message.reply(":x: Role not found")
+  }
+  if(args[0] && !isNaN(args[0])){
+    role = message.guild.roles.cache.find(e => e.id == args[0])
+    if(!message.guild.roles.cache.has(args[0])) return message.reply(" Role not found")
+  }
+  if(!role) return message.reply("You must choose role")
+let rolemembers;
+if(role.members.size = 4) rolemembers = role.members.map(e => `${e.user.tag}`)
+
+    let pages = [];
+for (let i = 0; i < rolemembers.length;) {
+    if ((i + 40) > rolemembers.length) {
+        pages.push(rolemembers.slice(i, (i + 40) - ((i + 40) - rolemembers.length)).join("\n"));
+        break;
+    } else {
+        pages.push(rolemembers.slice(i, i + 40).join("\n"));
+        i += 40
+    };
+}
+    let page = 1;
+    const embed = new Discord.MessageEmbed()
+        .setTitle(`Role Members Size: ${role.members.size || 0}`)
+        .setColor('RANDOM')
+        .setFooter(`Page: ${page}/${pages.length}`)
+        .setDescription(pages[page-1])
+        .setTimestamp();
+        message.channel.send(embed).then(msg => {
+            if (!message.guild.member(client.user).hasPermission('ADD_REACTIONS')) return;
+ 
+            msg.react("◀").then(() => {
+                msg.react("▶")
+ 
+                const backF = (reaction, user) => reaction.emoji.name === '◀' && user.id === message.author.id;
+                const ForF = (reaction, user) => reaction.emoji.name === '▶' && user.id === message.author.id;
+ 
+                const back = msg.createReactionCollector(backF, { time: 180000 });
+                const For = msg.createReactionCollector(ForF, { time: 180000 });
+ 
+                back.on('collect', async r => {
+                  
+                    if (page === 1) return;
+                    page--;
+                    embed.setDescription(pages[page-1]);
+                    embed.setFooter(`Page: ${page}/${pages.length}`);
+                    msg.edit(embed);
+                });
+ 
+                For.on('collect', async r => {
+                  
+                    if (page === pages.length) return;
+                    page++;
+                    embed.setDescription(pages[page-1]);
+                    embed.setFooter(`Page: ${page}/${pages.length}`);
+                    msg.edit(embed);
+                })})})}})
+
+
+const { parse } = require("twemoji-parser");
+
+client.on('message',async message => {
+  if(message.content.startsWith(prefix + "e")) { 
+  let args = message.content.split(" ").slice(1)
+    
+    const emoji = args[0];
+    if (!emoji) return message.channel.send("please Set a emoji !");
+
+    let custom = Discord.Util.parseEmoji(emoji);
+    const embed = new Discord.MessageEmbed()
+    .setTitle(`Here Is your Emoji   Name: ${emoji}`)
+   .setDescription(`https://cdn.discordapp.com/emojis/${custom.id}.${custom.animated ? "gif" : "png"}`)
+    .setFooter(`request by ${message.author.tag}`)
+    .setColor("#FFFF00");
+
+    if (custom.id) {
+        embed.setImage(`https://cdn.discordapp.com/emojis/${custom.id}.${custom.animated ? "gif" : "png"}`);
+        return message.channel.send(embed);
+    }
+    else {
+        let parsed = parse(emoji, { assetType: "png" });
+        if (!parsed[0]) return message.channel.send(" emoji Not Found!");
+        embed.setImage(parsed[0].url);
+        return message.channel.send(embed);
+    }}})
+client.on('message', async message => { 
+if(message.author.bot)return
+if(!message.content.startsWith(prefix))return
+let args =message.content.slice(prefix.length).trim().split(' ')
+let cmd = args.shift().toLowerCase()
+if(!cmd)return
+try{
+  delete require.cache[require.resolve(`./commands/${cmd}.js`)]
+let commandFile = require (`./commands/${cmd}.js`)
+  commandFile.run(client, message, args)
+}catch(e){ 
+}
+}
+)
+
+
+
+
+client.on('message',async message => {
+  if(message.content.startsWith(prefix + "swk")) { 
+  if(!message.member.hasPermission('MANAGE_CHANNELS'))return message.channel.send('gwbxo gawad')
+    const member = message.member;
+    let args = message.content.split(" ").slice(1) 
+   const entry = message.mentions.members.first() || message.guild.members.cache.get(args[0])
+   if (!entry) return message.channel.send("mention someone bo swk krdn");
+message.guild.members.cache.get(entry.id).roles.cache.map(userroles => {
+message.guild.members.cache.get(entry.id).roles.remove(userroles.id)})
+     const role = member.guild.roles.cache.find(r => r.id === "950499764942831667");
+  entry.roles.add(role);
+    const embed = new Discord.MessageEmbed()
+      .setTitle("ھەموو ڕۆڵەکانت لێ کرایەوەو بە سەرکەوتووی بووی بە  صەگی سێرڤەر پیرۆزە ")
+        .setColor("RANDOM")
+        .addField("ئیسمی شەریفت", entry)
+        .addField("ئەو کەسەی قۆنەرەی خستە دەمتەوە", message.author)
+    message.channel.send(embed)
+  }})
+
+require("discord-banner")();
+
+ client.on("message", async message => {
+  if (message.content.startsWith(prefix + "stb")) {
+    let member = message.mentions.users.first() || message.author;
+const embed = new Discord.MessageEmbed()
+  .setTitle(`${member}بانەرت بدزم نایدەمەوە`)
+.setImage(await member.bannerURL({ format: "gif", size: 512 }));
+
+message.channel.send(embed);
+
+   
+  }
+});
+})
